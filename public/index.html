@@ -4,575 +4,540 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TenderWatch — Мониторинг тендеров KZ</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080c14;
-  --surface: #0d1220;
-  --surface2: #121929;
-  --surface3: #1a2438;
-  --border: rgba(99,179,237,0.12);
-  --border2: rgba(99,179,237,0.22);
-  --accent: #3b82f6;
-  --accent2: #60a5fa;
-  --accent3: #93c5fd;
-  --green: #10b981;
-  --yellow: #f59e0b;
-  --red: #ef4444;
-  --purple: #8b5cf6;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
-  --text3: #475569;
-  --glow: rgba(59,130,246,0.15);
+  --bg:      #f0f4f8;
+  --surface: #ffffff;
+  --surface2:#f8fafc;
+  --surface3:#eef2f7;
+  --border:  rgba(15,23,42,0.08);
+  --border2: rgba(15,23,42,0.15);
+  --accent:  #2563eb;
+  --accent2: #3b82f6;
+  --accent3: #1d4ed8;
+  --green:   #059669;
+  --yellow:  #d97706;
+  --red:     #dc2626;
+  --purple:  #7c3aed;
+  --text:    #0f172a;
+  --text2:   #475569;
+  --text3:   #94a3b8;
+  --shadow:  0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow2: 0 4px 12px rgba(15,23,42,0.1);
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
-  min-height: 100vh;
-  overflow-x: hidden;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
 }
-body::before {
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events:none;
-  z-index:0;
-}
-.wrap { position:relative; z-index:1; }
-header {
+.wrap{position:relative;}
+
+/* ── HEADER ────────────────────────────────────────── */
+header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding: 16px 32px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(8,12,20,0.95);
-  backdrop-filter: blur(20px);
-  position: sticky;
+  padding:0 28px;
+  height:56px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow);
+  position:sticky;
   top:0;
   z-index:100;
 }
-.logo {
-  font-family: 'Unbounded', sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-.logo-icon {
-  width:32px; height:32px;
-  background: var(--accent);
-  border-radius: 8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.logo{
+  font-family:'Inter',sans-serif;
   font-size:16px;
-  box-shadow: 0 0 20px rgba(59,130,246,0.4);
-}
-.logo span { color: var(--accent2); }
-.header-status {
+  font-weight:700;
+  letter-spacing:-0.5px;
   display:flex;
   align-items:center;
-  gap:20px;
-  font-size:11px;
-  color: var(--text2);
+  gap:8px;
+  color:var(--text);
 }
-.pulse-dot {
-  width:8px; height:8px;
-  border-radius:50%;
-  background: var(--yellow);
-  box-shadow: 0 0 10px var(--yellow);
-  animation: pulse-anim 2s infinite;
-}
-@keyframes pulse-anim {
-  0%,100%{ opacity:1; transform:scale(1); }
-  50%{ opacity:0.5; transform:scale(1.3); }
-}
-.main {
-  display:grid;
-  grid-template-columns: 280px 1fr;
-  min-height: calc(100vh - 61px);
-}
-.sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 0;
-  position: sticky;
-  top:61px;
-  height: calc(100vh - 61px);
-  overflow-y:auto;
-  scrollbar-width: thin;
-}
-.sidebar::-webkit-scrollbar { width:4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--surface3); border-radius:2px; }
-.sidebar-label {
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform:uppercase;
-  color: var(--text3);
-  padding: 12px 20px 6px;
-}
-.sidebar-item {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding: 9px 20px;
-  cursor:pointer;
-  font-size: 12px;
-  color: var(--text2);
-  border-left: 2px solid transparent;
-  transition: all 0.15s;
-}
-.sidebar-item:hover { background: var(--surface2); color: var(--text); }
-.sidebar-item.active {
-  background: rgba(59,130,246,0.08);
-  color: var(--accent2);
-  border-left-color: var(--accent);
-}
-.sidebar-item .icon { width:18px; text-align:center; font-size:14px; }
-.sidebar-count {
-  margin-left:auto;
-  background: var(--surface3);
-  border-radius:10px;
-  padding: 1px 7px;
-  font-size:10px;
-  color: var(--text3);
-}
-.sidebar-item.active .sidebar-count {
-  background: rgba(59,130,246,0.2);
-  color: var(--accent2);
-}
-.token-panel {
-  margin: 16px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  padding: 14px;
-}
-.token-panel label {
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform:uppercase;
-  color: var(--text3);
-  display:block;
-  margin-bottom: 8px;
-}
-.token-input-wrap { display:flex; gap:6px; }
-.token-input {
-  flex:1;
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 7px 10px;
-  color: var(--accent3);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  outline:none;
-  transition: border 0.2s;
-}
-.token-input:focus { border-color: var(--accent); }
-.btn-sm {
-  background: var(--accent);
-  border:none;
-  border-radius: 6px;
-  padding: 7px 12px;
+.logo-icon{
+  width:30px;height:30px;
+  background:var(--accent);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;
   color:#fff;
-  font-size: 11px;
-  cursor:pointer;
-  font-family: 'JetBrains Mono', monospace;
-  transition: all 0.2s;
+  box-shadow:0 2px 8px rgba(37,99,235,0.3);
 }
-.btn-sm:hover { background: var(--accent2); }
-.content { padding: 24px; overflow-y:auto; }
-.stats-grid {
+.logo em{color:var(--accent);font-style:normal;}
+.header-status{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  font-size:12px;
+  color:var(--text2);
+}
+.pulse-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 0 2px rgba(217,119,6,0.2);
+  animation:pulse-anim 2s infinite;
+}
+@keyframes pulse-anim{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.6;transform:scale(1.2);}
+}
+
+/* ── LAYOUT ────────────────────────────────────────── */
+.main{
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
+  grid-template-columns:260px 1fr;
+  min-height:calc(100vh - 56px);
 }
-.stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:16px 0;
+  position:sticky;
+  top:56px;
+  height:calc(100vh - 56px);
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:var(--surface3) transparent;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px;}
+
+.sidebar-label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text3);
+  padding:14px 16px 5px;
+}
+.sidebar-item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 16px;
+  cursor:pointer;
+  font-size:13px;
+  color:var(--text2);
+  border-radius:0;
+  border-left:2px solid transparent;
+  transition:all 0.15s;
+  margin:0 4px 1px;
+  border-radius:6px;
+}
+.sidebar-item:hover{background:var(--surface2);color:var(--text);}
+.sidebar-item.active{
+  background:rgba(37,99,235,0.07);
+  color:var(--accent);
+  border-left-color:var(--accent);
+  font-weight:500;
+  border-radius:0 6px 6px 0;
+  margin-left:0;
+}
+.sidebar-item .icon{width:18px;text-align:center;font-size:15px;}
+.sidebar-count{
+  margin-left:auto;
+  background:var(--surface3);
+  border-radius:10px;
+  padding:1px 8px;
+  font-size:11px;
+  font-weight:500;
+  color:var(--text3);
+}
+.sidebar-item.active .sidebar-count{
+  background:rgba(37,99,235,0.12);
+  color:var(--accent);
+}
+
+/* ── TOKEN PANEL ───────────────────────────────────── */
+.token-panel{
+  margin:0 12px 8px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+}
+.token-panel label{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--text3);
+  display:block;
+  margin-bottom:7px;
+}
+.token-input-wrap{display:flex;gap:6px;}
+.token-input{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 9px;
+  color:var(--accent3);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  outline:none;
+  transition:border 0.2s;
+}
+.token-input:focus{border-color:var(--accent);}
+.btn-sm{
+  background:var(--accent);
+  border:none;
+  border-radius:6px;
+  padding:6px 12px;
+  color:#fff;
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.btn-sm:hover{background:var(--accent3);}
+
+/* ── CONTENT ───────────────────────────────────────── */
+.content{padding:20px 24px;overflow-y:auto;}
+
+/* ── STATS ─────────────────────────────────────────── */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
   position:relative;
   overflow:hidden;
-  transition: border-color 0.2s;
+  box-shadow:var(--shadow);
+  transition:box-shadow 0.2s;
 }
-.stat-card:hover { border-color: var(--border2); }
-.stat-card::before {
+.stat-card:hover{box-shadow:var(--shadow2);}
+.stat-card::before{
   content:'';
   position:absolute;
-  top:0; left:0; right:0;
-  height:2px;
-  border-radius:2px 2px 0 0;
+  top:0;left:0;right:0;
+  height:3px;
+  border-radius:3px 3px 0 0;
 }
-.stat-card.blue::before { background: var(--accent); }
-.stat-card.green::before { background: var(--green); }
-.stat-card.yellow::before { background: var(--yellow); }
-.stat-card.purple::before { background: var(--purple); }
-.stat-label {
-  font-size: 10px;
-  letter-spacing: 1px;
-  text-transform:uppercase;
-  color: var(--text3);
-  margin-bottom: 8px;
+.stat-card.blue::before{background:var(--accent);}
+.stat-card.green::before{background:var(--green);}
+.stat-card.yellow::before{background:var(--yellow);}
+.stat-card.purple::before{background:var(--purple);}
+.stat-label{font-size:11px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+.stat-value{font-size:24px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px;}
+.stat-sub{font-size:11px;color:var(--text3);}
+.stat-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:28px;opacity:0.1;}
+
+/* ── TOOLBAR ───────────────────────────────────────── */
+.ep-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.ep-btn{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:6px 14px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all 0.15s;
+  font-weight:500;
+  box-shadow:var(--shadow);
 }
-.stat-value {
-  font-family: 'Unbounded', sans-serif;
-  font-size: 26px;
-  font-weight: 600;
-  color: var(--text);
-  line-height:1;
-  margin-bottom: 6px;
-}
-.stat-sub { font-size: 10px; color: var(--text3); }
-.stat-icon {
-  position:absolute;
-  right:16px; top:50%;
-  transform:translateY(-50%);
-  font-size:32px;
-  opacity:0.08;
-}
-.toolbar {
+.ep-btn:hover{border-color:var(--border2);color:var(--text);}
+.ep-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.25);}
+
+.toolbar{
   display:flex;
   align-items:center;
-  gap:10px;
-  margin-bottom: 18px;
+  gap:8px;
+  margin-bottom:14px;
   flex-wrap:wrap;
 }
-.search-wrap { flex:1; min-width:200px; position:relative; }
-.search-wrap::before {
+.search-wrap{flex:1;min-width:200px;position:relative;}
+.search-wrap::before{
   content:'🔍';
   position:absolute;
-  left:12px; top:50%;
+  left:10px;top:50%;
   transform:translateY(-50%);
+  font-size:12px;
+  opacity:0.35;
+}
+.search-input{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 12px 8px 34px;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
   font-size:13px;
-  opacity:0.4;
+  outline:none;
+  transition:border 0.2s,box-shadow 0.2s;
+  box-shadow:var(--shadow);
 }
-.search-input {
-  width:100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px 9px 36px;
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
+.search-input::placeholder{color:var(--text3);}
+.filter-select{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 12px;
+  color:var(--text2);
+  font-family:'Inter',sans-serif;
   font-size:12px;
   outline:none;
-  transition: border 0.2s;
-}
-.search-input:focus { border-color: var(--accent); }
-.search-input::placeholder { color: var(--text3); }
-.filter-select {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 14px;
-  color: var(--text2);
-  font-family: 'JetBrains Mono', monospace;
-  font-size:11px;
-  outline:none;
   cursor:pointer;
-  appearance:none;
+  box-shadow:var(--shadow);
+  transition:border 0.2s;
 }
-.filter-select:focus { border-color: var(--accent); }
-.btn-load {
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+.filter-select:focus{border-color:var(--accent);}
+.page-size-wrap{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text3);
+}
+.page-size-wrap select{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:4px 8px;
+  color:var(--text2);
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  outline:none;cursor:pointer;
+}
+.btn-load{
+  background:var(--accent);
   border:none;
-  border-radius: 8px;
-  padding: 9px 20px;
+  border-radius:8px;
+  padding:8px 20px;
   color:#fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size:12px;
-  font-weight:500;
+  font-family:'Inter',sans-serif;
+  font-size:13px;
+  font-weight:600;
   cursor:pointer;
-  transition: all 0.2s;
-  box-shadow: 0 0 20px rgba(59,130,246,0.2);
-}
-.btn-load:hover { transform:translateY(-1px); box-shadow: 0 0 30px rgba(59,130,246,0.35); }
-.btn-load:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-.page-size-wrap {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:11px;
-  color: var(--text3);
-}
-.page-size-wrap select {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 4px 8px;
-  color: var(--text2);
-  font-family: 'JetBrains Mono', monospace;
-  font-size:11px;
-  outline:none;
-  cursor:pointer;
-}
-.table-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-.table-head {
-  display:grid;
-  grid-template-columns: 80px 1fr 160px 130px 110px 90px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  padding: 0 16px;
-}
-.th {
-  padding: 10px 8px;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  text-transform:uppercase;
-  color: var(--text3);
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-.tender-row {
-  display:grid;
-  grid-template-columns: 80px 1fr 160px 130px 110px 90px;
-  border-bottom: 1px solid var(--border);
-  padding: 0 16px;
-  cursor:pointer;
-  transition: background 0.15s;
-  animation: row-in 0.3s ease both;
-}
-@keyframes row-in {
-  from { opacity:0; transform:translateY(6px); }
-  to { opacity:1; transform:translateY(0); }
-}
-.tender-row:last-child { border-bottom:none; }
-.tender-row:hover { background: var(--surface2); }
-.td {
-  padding: 12px 8px;
-  font-size: 11px;
-  display:flex;
-  align-items:center;
-  overflow:hidden;
-}
-.td.num { color: var(--text3); font-size:10px; }
-.td.title { flex-direction:column; align-items:flex-start; gap:3px; }
-.tender-name {
-  color: var(--text);
-  font-size:12px;
-  line-height:1.35;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-.tender-customer {
-  color: var(--text3);
-  font-size:10px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width:100%;
-}
-.td.amount { color: var(--green); font-weight:500; }
-.td.deadline { color: var(--text2); }
-.tag {
-  display:inline-flex;
-  align-items:center;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 9px;
-  letter-spacing:0.5px;
-  font-weight:500;
-  text-transform:uppercase;
+  transition:all 0.2s;
+  box-shadow:0 2px 8px rgba(37,99,235,0.25);
   white-space:nowrap;
 }
-.tag-platform { background: rgba(99,102,241,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
-.tag-status-active { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
-.tag-status-soon { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
-.tag-status-closed { background: rgba(100,116,139,0.12); color: #94a3b8; border: 1px solid rgba(100,116,139,0.2); }
-.loader-wrap {
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding: 60px 0;
-  gap: 16px;
-  color: var(--text3);
-  font-size:12px;
-}
-.loader-wrap.active { display:flex; }
-.spinner {
-  width:40px; height:40px;
-  border: 2px solid var(--surface3);
-  border-top-color: var(--accent);
-  border-radius:50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform:rotate(360deg); } }
-.state-msg { text-align:center; padding: 60px 0; color: var(--text3); font-size:12px; display:none; }
-.state-msg.active { display:block; }
-.state-msg .big { font-size:32px; margin-bottom:10px; }
-.state-msg .hint { color: var(--text3); font-size:11px; margin-top:8px; }
-.pagination {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  font-size:11px;
-  color: var(--text3);
-  flex-wrap:wrap;
-  gap:10px;
-}
-.page-info { color: var(--text2); }
-.page-btns { display:flex; gap:6px; align-items:center; }
-.page-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius:6px;
-  padding: 5px 12px;
-  color: var(--text2);
-  font-family: 'JetBrains Mono', monospace;
-  font-size:11px;
-  cursor:pointer;
-  transition: all 0.15s;
-}
-.page-btn:hover { border-color: var(--accent); color: var(--accent2); }
-.page-btn.active { background: var(--accent); border-color: var(--accent); color:#fff; }
-.page-btn:disabled { opacity:0.3; cursor:not-allowed; }
-.modal-overlay {
-  position:fixed; inset:0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter:blur(4px);
-  z-index:200;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding: 20px;
-}
-.modal-overlay.active { display:flex; }
-.modal {
-  background: var(--surface);
-  border: 1px solid var(--border2);
-  border-radius: 16px;
-  width:100%;
-  max-width: 720px;
-  max-height: 80vh;
-  overflow-y:auto;
-  box-shadow: 0 0 80px rgba(59,130,246,0.15);
-  animation: modal-in 0.25s ease;
-}
-@keyframes modal-in {
-  from { opacity:0; transform:scale(0.95) translateY(10px); }
-  to { opacity:1; transform:scale(1) translateY(0); }
-}
-.modal-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  padding: 24px;
-  border-bottom: 1px solid var(--border);
-}
-.modal-title {
-  font-family: 'Unbounded', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  line-height:1.4;
-  flex:1;
-  padding-right:16px;
-}
-.modal-close {
-  background:none; border:none;
-  color: var(--text3); font-size:20px;
-  cursor:pointer; line-height:1;
-  transition: color 0.15s; flex-shrink:0;
-}
-.modal-close:hover { color: var(--text); }
-.modal-body { padding: 24px; }
-.detail-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-.detail-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color: var(--text3); margin-bottom:5px; }
-.detail-value { font-size:13px; color: var(--text); }
-.detail-value.amount-big {
-  font-family: 'Unbounded', sans-serif;
-  font-size:18px; font-weight:600; color: var(--green);
-}
-.modal-link {
-  display:inline-flex; align-items:center; gap:6px;
-  background: var(--accent); color:#fff;
-  border:none; border-radius:8px;
-  padding: 10px 20px;
-  font-family: 'JetBrains Mono', monospace; font-size:12px;
-  cursor:pointer; text-decoration:none; transition: all 0.2s; margin-top:8px;
-}
-.modal-link:hover { background: var(--accent2); }
-.api-log {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  font-size:10px;
-  max-height: 140px;
-  overflow-y:auto;
-  scrollbar-width: thin;
-}
-.log-line { color: var(--text3); line-height:1.7; display:flex; gap:8px; }
-.log-line .ts { color: var(--text3); opacity:0.5; flex-shrink:0; }
-.log-line .ok { color: var(--green); }
-.log-line .err { color: var(--red); }
-.log-line .info { color: var(--accent2); }
-.log-line .warn { color: var(--yellow); }
-.notice {
-  background: rgba(16,185,129,0.07);
-  border: 1px solid rgba(16,185,129,0.15);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-size:11px;
-  color: var(--text2);
-  margin-bottom: 20px;
-  line-height:1.6;
-}
-.notice strong { color: #34d399; }
-.ep-btn {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius:6px;
-  padding: 6px 14px;
-  font-family:'JetBrains Mono', monospace;
-  font-size:10px;
-  color: var(--text3);
-  cursor:pointer;
-  transition: all 0.15s;
-}
-.ep-btn:hover { border-color: var(--border2); color: var(--text2); }
-.ep-btn.active { background: rgba(59,130,246,0.1); border-color: var(--accent); color: var(--accent2); }
-.results-bar { display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:11px; color: var(--text3); }
-.results-count {
-  background: var(--surface2);
+.btn-load:hover{background:var(--accent3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.3);}
+.btn-load:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
+
+/* ── TABLE ─────────────────────────────────────────── */
+.results-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--text3);}
+.results-count{
+  background:var(--surface);
   border:1px solid var(--border);
   border-radius:20px;
-  padding: 3px 12px;
-  font-size:10px;
-  color: var(--text2);
+  padding:2px 10px;
+  font-size:11px;
+  color:var(--text2);
+  font-weight:500;
 }
-::-webkit-scrollbar { width:6px; height:6px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background: var(--surface3); border-radius:3px; }
-@media(max-width:900px) {
-  .main { grid-template-columns:1fr; }
-  .sidebar { position:static; height:auto; }
-  .stats-grid { grid-template-columns:repeat(2,1fr); }
-  .table-head, .tender-row { grid-template-columns: 60px 1fr 130px 90px; }
-  .td:nth-child(4), .th:nth-child(4) { display:none; }
-  .td:nth-child(5), .th:nth-child(5) { display:none; }
+.table-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.table-head{
+  display:grid;
+  grid-template-columns:80px 1fr 160px 130px 110px 90px;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  padding:0 14px;
+}
+.th{
+  padding:9px 8px;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+.tender-row{
+  display:grid;
+  grid-template-columns:80px 1fr 160px 130px 110px 90px;
+  border-bottom:1px solid var(--border);
+  padding:0 14px;
+  cursor:pointer;
+  transition:background 0.12s;
+  animation:row-in 0.25s ease both;
+}
+@keyframes row-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.tender-row:last-child{border-bottom:none;}
+.tender-row:hover{background:rgba(37,99,235,0.03);}
+.td{padding:11px 8px;font-size:12px;display:flex;align-items:center;overflow:hidden;}
+.td.num{color:var(--text3);font-size:10px;font-family:'JetBrains Mono',monospace;}
+.td.title{flex-direction:column;align-items:flex-start;gap:2px;}
+.tender-name{
+  color:var(--text);font-size:12px;line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.tender-customer{color:var(--text3);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.td.amount{color:var(--green);font-weight:600;}
+.td.deadline{color:var(--text2);flex-direction:column;align-items:flex-start;gap:1px;}
+
+/* ── TAGS ──────────────────────────────────────────── */
+.tag{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;
+}
+.tag-platform{background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid rgba(124,58,237,0.15);}
+.tag-status-active{background:rgba(5,150,105,0.08);color:#059669;border:1px solid rgba(5,150,105,0.15);}
+.tag-status-soon{background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.15);}
+.tag-status-closed{background:rgba(100,116,139,0.08);color:#64748b;border:1px solid rgba(100,116,139,0.15);}
+
+/* ── LOADER / EMPTY ────────────────────────────────── */
+.loader-wrap{
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:56px 0;gap:14px;
+  color:var(--text3);font-size:13px;
+}
+.loader-wrap.active{display:flex;}
+.spinner{
+  width:36px;height:36px;
+  border:2px solid var(--border2);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.state-msg{text-align:center;padding:56px 0;color:var(--text3);font-size:13px;display:none;}
+.state-msg.active{display:block;}
+.state-msg .big{font-size:36px;margin-bottom:10px;}
+.state-msg .hint{font-size:12px;margin-top:6px;}
+
+/* ── PAGINATION ────────────────────────────────────── */
+.pagination{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text3);flex-wrap:wrap;gap:8px;
+}
+.page-info{color:var(--text2);font-weight:500;}
+.page-btns{display:flex;gap:4px;align-items:center;}
+.page-btn{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:5px 12px;
+  color:var(--text2);
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  cursor:pointer;
+  transition:all 0.12s;
+  box-shadow:var(--shadow);
+}
+.page-btn:hover{border-color:var(--accent);color:var(--accent);}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.page-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+/* ── NOTICE ────────────────────────────────────────── */
+.notice{
+  background:rgba(5,150,105,0.06);
+  border:1px solid rgba(5,150,105,0.18);
+  border-radius:10px;
+  padding:12px 16px;
+  font-size:12px;
+  color:var(--text2);
+  margin-bottom:18px;
+  line-height:1.6;
+}
+.notice strong{color:#059669;}
+
+/* ── API LOG ───────────────────────────────────────── */
+.api-log{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:10px 12px;
+  margin:8px 12px 16px;
+  font-size:10px;
+  max-height:130px;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  font-family:'JetBrains Mono',monospace;
+}
+.log-line{color:var(--text3);line-height:1.8;display:flex;gap:8px;}
+.log-line .ts{opacity:0.5;flex-shrink:0;}
+.log-line .ok{color:var(--green);}
+.log-line .err{color:var(--red);}
+.log-line .info{color:var(--accent);}
+.log-line .warn{color:var(--yellow);}
+
+/* ── MODAL ─────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(15,23,42,0.4);
+  backdrop-filter:blur(4px);
+  z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  width:100%;max-width:720px;max-height:82vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(15,23,42,0.18);
+  animation:modal-in 0.2s ease;
+}
+@keyframes modal-in{from{opacity:0;transform:scale(0.97) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-head{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:22px 24px;border-bottom:1px solid var(--border);
+  background:var(--surface2);border-radius:16px 16px 0 0;
+}
+.modal-title{
+  font-size:15px;font-weight:600;
+  color:var(--text);line-height:1.4;flex:1;padding-right:16px;
+}
+.modal-close{
+  background:none;border:none;
+  color:var(--text3);font-size:18px;
+  cursor:pointer;line-height:1;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;transition:all 0.15s;flex-shrink:0;
+}
+.modal-close:hover{background:var(--surface3);color:var(--text);}
+.modal-body{padding:22px 24px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.detail-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.detail-value{font-size:13px;color:var(--text);line-height:1.4;}
+.detail-value.amount-big{font-size:22px;font-weight:700;color:var(--green);}
+.modal-link{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:8px;
+  padding:9px 18px;font-size:13px;font-weight:500;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;margin-top:6px;
+}
+.modal-link:hover{background:var(--accent3);}
+
+/* ── SCROLLBARS ────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+
+/* ── RESPONSIVE ────────────────────────────────────── */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .table-head,.tender-row{grid-template-columns:60px 1fr 120px 80px;}
+  .td:nth-child(5),.th:nth-child(5){display:none;}
+  .td:nth-child(6),.th:nth-child(6){display:none;}
 }
 </style>
 </head>
@@ -581,13 +546,13 @@ header {
 <header>
   <div class="logo">
     <div class="logo-icon">⚡</div>
-    Tender<span>Watch</span>
+    Tender<em>Watch</em>
   </div>
   <div class="header-status">
     <div class="pulse-dot" id="statusDot"></div>
     <span id="statusText">Ожидание</span>
-    <span style="color:var(--text3)">|</span>
-    <span id="lastSync" style="font-size:10px;">—</span>
+    <span style="color:var(--border2)">|</span>
+    <span id="lastSync" style="font-size:11px;font-family:'JetBrains Mono',monospace;">—</span>
   </div>
 </header>
 
@@ -596,19 +561,19 @@ header {
   <div class="token-panel">
     <label>🔑 API Token</label>
     <div class="token-input-wrap">
-      <input type="text" class="token-input" id="tokenInput"
-        placeholder="Вставьте ваш токен..."
+      <input type="password" class="token-input" id="tokenInput"
+        placeholder="Вставьте токен..."
         value="4c9321c22ab7b510786b1e27fa7a31cb">
       <button class="btn-sm" onclick="saveToken()">OK</button>
     </div>
   </div>
 
   <div class="sidebar-label">Навигация</div>
-  <div class="sidebar-item active" onclick="switchEndpoint('tender',this)">
+  <div class="sidebar-item active" id="nav-tender" onclick="switchEndpoint('tender',this)">
     <span class="icon">📋</span> Тендеры
     <span class="sidebar-count" id="cnt-tenders">—</span>
   </div>
-  <div class="sidebar-item" onclick="switchEndpoint('contract',this)">
+  <div class="sidebar-item" id="nav-contract" onclick="switchEndpoint('contract',this)">
     <span class="icon">📄</span> Договоры
     <span class="sidebar-count" id="cnt-contracts">—</span>
   </div>
@@ -627,13 +592,13 @@ header {
 
   <div class="sidebar-label">API Лог</div>
   <div class="api-log" id="apiLog">
-    <div class="log-line"><span class="ts">--:--:--</span><span class="info">TenderWatch готов к работе</span></div>
+    <div class="log-line"><span class="ts">--:--:--</span><span class="info">TenderWatch готов</span></div>
   </div>
 </aside>
 
 <main class="content">
   <div class="notice" id="proxyNotice">
-    ✅ <strong>Реальные данные через прокси</strong> — запросы идут через <code style="color:#34d399">/api/proxy</code> на сервере Vercel, CORS обходится на стороне сервера.
+    ✅ <strong>Реальные данные через прокси</strong> — запросы идут через <code>/api/proxy</code> на Vercel, CORS обходится на стороне сервера.
   </div>
 
   <div class="stats-grid">
@@ -663,15 +628,14 @@ header {
     </div>
   </div>
 
-  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-    <button class="ep-btn active" id="epBtn1" onclick="switchEndpoint('tender',null,this)">GET /tender/</button>
-    <button class="ep-btn" id="epBtn2" onclick="switchEndpoint('contract',null,this)">GET /contract/</button>
+  <div class="ep-row">
+    <button class="ep-btn active" id="epBtn1" onclick="switchEndpoint('tender',document.getElementById('nav-tender'),this)">GET /tender/</button>
+    <button class="ep-btn" id="epBtn2" onclick="switchEndpoint('contract',document.getElementById('nav-contract'),this)">GET /contract/</button>
   </div>
 
   <div class="toolbar">
     <div class="search-wrap">
-      <input type="text" class="search-input" id="searchInput"
-        placeholder="Поиск по названию или заказчику...">
+      <input type="text" class="search-input" id="searchInput" placeholder="Поиск по названию или заказчику...">
     </div>
     <select class="filter-select" id="statusFilter">
       <option value="">Все статусы</option>
@@ -698,7 +662,7 @@ header {
 
   <div class="results-bar">
     <div class="results-count" id="resultsCount">Нет данных</div>
-    <span id="queryInfo" style="font-size:10px;color:var(--text3);"></span>
+    <span id="queryInfo" style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;"></span>
   </div>
 
   <div class="table-wrap">
@@ -741,16 +705,14 @@ header {
 </div>
 
 <script>
-// ─── PROXY CONFIG ─────────────────────────────────────────────────────────────
-// Когда открыто с Vercel — запросы идут через /api/proxy (тот же домен = нет CORS)
-// Когда открыто локально — тоже работает, если запущен vercel dev
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
 const PROXY = '/api/proxy';
-
 let TOKEN = '4c9321c22ab7b510786b1e27fa7a31cb';
 let currentEndpoint = 'tender';
 let currentPage = 1;
 let totalPages = 1;
 let allData = [];
+let abortCtrl = null; // для отмены дублирующих запросов
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
 const ts = () => new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -761,32 +723,38 @@ function addLog(msg, type='info') {
   d.className = 'log-line';
   d.innerHTML = `<span class="ts">${ts()}</span><span class="${type}">${msg}</span>`;
   log.appendChild(d);
+  // Держим не более 50 строк
+  while(log.children.length > 50) log.removeChild(log.firstChild);
   log.scrollTop = log.scrollHeight;
 }
 
 function fmtMoney(v) {
   const n = parseFloat(v);
   if(!v || isNaN(n)) return '—';
-  if(n>=1e9) return (n/1e9).toFixed(2)+' млрд';
-  if(n>=1e6) return (n/1e6).toFixed(2)+' млн';
-  if(n>=1e3) return (n/1e3).toFixed(0)+' тыс';
+  if(n >= 1e9) return (n/1e9).toFixed(2)+' млрд';
+  if(n >= 1e6) return (n/1e6).toFixed(2)+' млн';
+  if(n >= 1e3) return (n/1e3).toFixed(0)+' тыс';
   return n.toLocaleString('ru');
 }
 
 function fmtDate(s) {
   if(!s) return '—';
-  try { return new Date(s).toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'numeric'}); }
-  catch(e) { return s; }
+  try {
+    const d = new Date(s);
+    return isNaN(d) ? s : d.toLocaleDateString('ru',{day:'2-digit',month:'2-digit',year:'numeric'});
+  } catch(e) { return s; }
 }
 
 function daysLeft(s) {
   if(!s) return null;
-  try { return Math.ceil((new Date(s) - Date.now()) / 86400000); }
-  catch(e) { return null; }
+  try {
+    const d = Math.ceil((new Date(s) - Date.now()) / 86400000);
+    return isNaN(d) ? null : d;
+  } catch(e) { return null; }
 }
 
 function getStatus(item) {
-  const end = item.end_date || item.deadline || item.date_end || item.publish_end_date;
+  const end = item.end_date||item.deadline||item.date_end||item.publish_end_date;
   if(!end) return 'unknown';
   const d = daysLeft(end);
   if(d === null) return 'unknown';
@@ -805,10 +773,16 @@ function statusTag(s) {
 function setStatus(online) {
   const dot = document.getElementById('statusDot');
   const txt = document.getElementById('statusText');
-  dot.style.background = online ? 'var(--green)' : 'var(--red)';
-  dot.style.boxShadow  = online ? '0 0 10px var(--green)' : '0 0 10px var(--red)';
-  txt.textContent = online ? 'Онлайн' : 'Ошибка';
-  if(online) document.getElementById('lastSync').textContent = ts();
+  if(online) {
+    dot.style.background = 'var(--green)';
+    dot.style.boxShadow  = '0 0 0 2px rgba(5,150,105,0.2)';
+    txt.textContent = 'Онлайн';
+    document.getElementById('lastSync').textContent = ts();
+  } else {
+    dot.style.background = 'var(--red)';
+    dot.style.boxShadow  = '0 0 0 2px rgba(220,38,38,0.2)';
+    txt.textContent = 'Ошибка';
+  }
 }
 
 // ─── LOAD ─────────────────────────────────────────────────────────────────────
@@ -816,8 +790,13 @@ async function loadData() {
   TOKEN = document.getElementById('tokenInput').value.trim();
   if(!TOKEN) { addLog('Введите токен!','err'); return; }
 
+  // Отменяем предыдущий запрос если он ещё идёт
+  if(abortCtrl) { abortCtrl.abort(); }
+  abortCtrl = new AbortController();
+
   const btn = document.getElementById('loadBtn');
-  btn.disabled = true; btn.textContent = '⏳ Загрузка...';
+  btn.disabled = true;
+  btn.textContent = '⏳ Загрузка...';
   document.getElementById('loader').classList.add('active');
   document.getElementById('tableBody').innerHTML = '';
   document.getElementById('emptyMsg').classList.remove('active');
@@ -825,82 +804,81 @@ async function loadData() {
 
   const dot = document.getElementById('statusDot');
   dot.style.background = 'var(--yellow)';
-  dot.style.boxShadow  = '0 0 10px var(--yellow)';
+  dot.style.boxShadow  = '0 0 0 2px rgba(217,119,6,0.2)';
   document.getElementById('statusText').textContent = 'Запрос...';
 
   const limit = document.getElementById('pageSizeSelect').value;
 
-  // Запрос через прокси: /api/proxy?path=tender/&token=...&limit=...&page=...
+  // ✅ Правильный URL через прокси
   const params = new URLSearchParams({
-    path: `${currentEndpoint}/`,
+    path:  `${currentEndpoint}/`,
     token: TOKEN,
     limit,
-    page: currentPage
+    page:  currentPage,
   });
 
   const url = `${PROXY}?${params}`;
-  addLog(`→ /${currentEndpoint}/?limit=${limit}&page=${currentPage}`, 'info');
+  addLog(`→ /api/proxy?path=${currentEndpoint}/&limit=${limit}&page=${currentPage}`, 'info');
 
   try {
-    const resp = await fetch(url);
+    const resp = await fetch(url, { signal: abortCtrl.signal });
     addLog(`← HTTP ${resp.status}`, resp.ok ? 'ok' : 'err');
 
     if(!resp.ok) {
       const errText = await resp.text();
-      throw new Error(`HTTP ${resp.status}: ${errText.substring(0,100)}`);
+      throw new Error(`HTTP ${resp.status}: ${errText.substring(0,120)}`);
     }
 
     const data = await resp.json();
     processData(data);
 
   } catch(err) {
+    if(err.name === 'AbortError') return; // тихо, запрос отменён намеренно
     addLog(`Ошибка: ${err.message}`, 'err');
     setStatus(false);
+    document.getElementById('loader').classList.remove('active');
     document.getElementById('tableBody').innerHTML = `
-      <div style="padding:40px;text-align:center;color:var(--red);font-size:12px;">
-        ❌ ${err.message}<br>
+      <div style="padding:40px;text-align:center;color:var(--red);font-size:13px;">
+        ❌ ${escapeHtml(err.message)}<br>
         <span style="color:var(--text3);font-size:11px;margin-top:8px;display:block;">
-          Убедитесь что вы открыли приложение через Vercel, а не как локальный файл.
+          Убедитесь, что приложение открыто через Vercel, а не как локальный файл.
         </span>
       </div>`;
   } finally {
-    btn.disabled = false; btn.textContent = '⚡ Загрузить';
+    btn.disabled = false;
+    btn.textContent = '⚡ Загрузить';
     document.getElementById('loader').classList.remove('active');
   }
 }
 
 // ─── PROCESS ─────────────────────────────────────────────────────────────────
 function processData(data) {
-  // Пробуем разные форматы ответа TenderPlus API
   const items = data.data || data.items || data.results ||
                 data.tenders || data.contracts ||
                 (Array.isArray(data) ? data : []);
-
   const total = data.total || data.count || data.totalCount || items.length;
   const limit = parseInt(document.getElementById('pageSizeSelect').value);
   totalPages = Math.max(1, Math.ceil(total / limit));
-
   allData = items;
 
-  // Считаем статистику
   let activeCount = 0, totalSum = 0;
   items.forEach(item => {
     if(['active','ending'].includes(getStatus(item))) activeCount++;
-    const amt = parseFloat(item.price || item.amount || item.budget || item.sum || 0);
+    const amt = parseFloat(item.price||item.amount||item.budget||item.sum||0);
     if(!isNaN(amt)) totalSum += amt;
   });
 
-  document.getElementById('s-total').textContent   = total.toLocaleString('ru');
-  document.getElementById('s-active').textContent  = activeCount;
-  document.getElementById('s-sum').textContent     = (totalSum/1e6).toFixed(1);
-  document.getElementById('s-pages').textContent   = totalPages;
+  document.getElementById('s-total').textContent  = total.toLocaleString('ru');
+  document.getElementById('s-active').textContent = activeCount;
+  document.getElementById('s-sum').textContent    = (totalSum/1e6).toFixed(1);
+  document.getElementById('s-pages').textContent  = totalPages;
   document.getElementById('cnt-tenders').textContent = total;
   document.getElementById('cnt-active').textContent  = activeCount;
 
   setStatus(true);
   renderTable();
   renderPagination(total, limit);
-  addLog(`Отображено ${items.length} записей из ${total}`, 'ok');
+  addLog(`Загружено ${items.length} из ${total} записей`, 'ok');
 }
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
@@ -923,10 +901,10 @@ function renderTable() {
   const getAmt  = x => parseFloat(x.price||x.amount||x.budget||x.sum||0);
   const getDate = x => new Date(x.created_at||x.published_at||x.date||x.publish_date||0);
   const sorts = {
-    date_desc:  (a,b) => getDate(b)-getDate(a),
-    date_asc:   (a,b) => getDate(a)-getDate(b),
-    amount_desc:(a,b) => getAmt(b)-getAmt(a),
-    amount_asc: (a,b) => getAmt(a)-getAmt(b),
+    date_desc:   (a,b) => getDate(b)-getDate(a),
+    date_asc:    (a,b) => getDate(a)-getDate(b),
+    amount_desc: (a,b) => getAmt(b)-getAmt(a),
+    amount_asc:  (a,b) => getAmt(a)-getAmt(b),
   };
   data.sort(sorts[sort] || sorts.date_desc);
 
@@ -936,68 +914,86 @@ function renderTable() {
   const body = document.getElementById('tableBody');
   body.innerHTML = '';
 
-  if(!data.length) { document.getElementById('emptyMsg').classList.add('active'); return; }
+  if(!data.length) {
+    document.getElementById('emptyMsg').classList.add('active');
+    return;
+  }
   document.getElementById('emptyMsg').classList.remove('active');
 
+  const frag = document.createDocumentFragment();
   data.forEach((item, idx) => {
-    const name       = item.name_ru||item.name||item.title||item.subject||'Без названия';
-    const customer   = item.customer_name_ru||item.customer_name||item.customer||item.buyer||'—';
-    const amount     = fmtMoney(item.price||item.amount||item.budget||item.sum);
+    const name     = item.name_ru||item.name||item.title||item.subject||'Без названия';
+    const customer = item.customer_name_ru||item.customer_name||item.customer||item.buyer||'—';
+    const amount   = fmtMoney(item.price||item.amount||item.budget||item.sum);
     const deadlineRaw = item.end_date||item.deadline||item.date_end||item.publish_end_date;
     const deadlineStr = fmtDate(deadlineRaw);
-    const days       = daysLeft(deadlineRaw);
-    const platform   = item.platform_code||item.source||item.platform||'ГЗП';
-    const status     = getStatus(item);
-    const num        = item.number||item.reg_number||item.id||(idx+1);
+    const days     = daysLeft(deadlineRaw);
+    const platform = item.platform_code||item.source||item.platform||'ГЗП';
+    const status   = getStatus(item);
+    const num      = item.number||item.reg_number||item.id||(idx+1);
 
     let deadlineHtml = deadlineStr;
     if(days !== null && days >= 0) {
-      const col = days<=3?'var(--red)':days<=7?'var(--yellow)':'var(--text2)';
-      deadlineHtml = `<span style="color:${col}">${deadlineStr}</span>
-        <span style="font-size:9px;color:var(--text3);display:block;">${days}д осталось</span>`;
+      const col = days<=3?'var(--red)':days<=7?'var(--yellow)':'var(--text3)';
+      deadlineHtml = `<span style="color:${col}">${deadlineStr}</span><span style="font-size:10px;color:var(--text3);">${days}д осталось</span>`;
     }
 
     const row = document.createElement('div');
     row.className = 'tender-row';
-    row.style.animationDelay = (idx*0.02)+'s';
+    row.style.animationDelay = (idx * 0.018) + 's';
     row.innerHTML = `
-      <div class="td num">${String(num).slice(-8)}</div>
+      <div class="td num">${escapeHtml(String(num).slice(-8))}</div>
       <div class="td title">
-        <div class="tender-name">${name}</div>
-        <div class="tender-customer">👤 ${customer}</div>
+        <div class="tender-name">${escapeHtml(name)}</div>
+        <div class="tender-customer">👤 ${escapeHtml(customer)}</div>
       </div>
       <div class="td amount">${amount}</div>
       <div class="td deadline">${deadlineHtml}</div>
-      <div class="td"><span class="tag tag-platform">${platform}</span></div>
+      <div class="td"><span class="tag tag-platform">${escapeHtml(platform)}</span></div>
       <div class="td">${statusTag(status)}</div>
     `;
     row.onclick = () => openModal(item);
-    body.appendChild(row);
+    frag.appendChild(row);
   });
+  body.appendChild(frag);
 }
 
 // ─── PAGINATION ───────────────────────────────────────────────────────────────
 function renderPagination(total, perPage) {
-  if(totalPages <= 1) { document.getElementById('pagination').style.display='none'; return; }
-  document.getElementById('pagination').style.display = 'flex';
-  const s = (currentPage-1)*perPage+1, e = Math.min(currentPage*perPage, total);
+  const pg = document.getElementById('pagination');
+  if(totalPages <= 1) { pg.style.display='none'; return; }
+  pg.style.display = 'flex';
+
+  const s = (currentPage-1)*perPage+1;
+  const e = Math.min(currentPage*perPage, total);
   document.getElementById('pageInfo').textContent = `${s}–${e} из ${total}`;
 
   const btns = document.getElementById('pageBtns');
   btns.innerHTML = '';
+
   const addBtn = (label, page, active=false, disabled=false) => {
     const b = document.createElement('button');
     b.className = 'page-btn' + (active?' active':'');
-    b.textContent = label; b.disabled = disabled;
+    b.textContent = label;
+    b.disabled = disabled;
     b.onclick = () => { currentPage = page; loadData(); };
     btns.appendChild(b);
   };
+
   addBtn('←', currentPage-1, false, currentPage===1);
+
   const range = [];
   for(let i=Math.max(1,currentPage-2); i<=Math.min(totalPages,currentPage+2); i++) range.push(i);
-  if(range[0]>1) { addBtn('1',1); if(range[0]>2) { const s=document.createElement('span'); s.textContent='...'; s.style.cssText='padding:5px;color:var(--text3);font-size:12px;'; btns.appendChild(s); }}
+
+  if(range[0] > 1) {
+    addBtn('1', 1);
+    if(range[0] > 2) { const sp=document.createElement('span'); sp.textContent='…'; sp.style.cssText='padding:0 4px;color:var(--text3);'; btns.appendChild(sp); }
+  }
   range.forEach(p => addBtn(p, p, p===currentPage));
-  if(range[range.length-1]<totalPages) { if(range[range.length-1]<totalPages-1){const s=document.createElement('span');s.textContent='...';s.style.cssText='padding:5px;color:var(--text3);font-size:12px;';btns.appendChild(s);} addBtn(totalPages,totalPages); }
+  if(range[range.length-1] < totalPages) {
+    if(range[range.length-1] < totalPages-1){ const sp=document.createElement('span'); sp.textContent='…'; sp.style.cssText='padding:0 4px;color:var(--text3);'; btns.appendChild(sp); }
+    addBtn(totalPages, totalPages);
+  }
   addBtn('→', currentPage+1, false, currentPage===totalPages);
 }
 
@@ -1024,46 +1020,50 @@ function openModal(item) {
         <div class="detail-label">Сумма</div>
         <div class="detail-value amount-big">${amount} ₸</div>
       </div>
-      <div><div class="detail-label">Статус</div><div class="detail-value">${statusTag(status)} <span style="font-size:11px;color:var(--text3);margin-left:6px;">${daysStr}</span></div></div>
-      <div><div class="detail-label">Номер</div><div class="detail-value" style="color:var(--accent2)">${num}</div></div>
-      <div><div class="detail-label">Заказчик</div><div class="detail-value">${customer}</div></div>
-      <div><div class="detail-label">Регион</div><div class="detail-value">${region}</div></div>
-      <div><div class="detail-label">Категория</div><div class="detail-value">${category}</div></div>
-      <div><div class="detail-label">Площадка</div><div class="detail-value"><span class="tag tag-platform">${platform}</span></div></div>
+      <div><div class="detail-label">Статус</div><div class="detail-value">${statusTag(status)} <span style="font-size:11px;color:var(--text3);margin-left:6px;">${escapeHtml(daysStr)}</span></div></div>
+      <div><div class="detail-label">Номер</div><div class="detail-value" style="color:var(--accent);font-family:'JetBrains Mono',monospace;">${escapeHtml(String(num))}</div></div>
+      <div><div class="detail-label">Заказчик</div><div class="detail-value">${escapeHtml(customer)}</div></div>
+      <div><div class="detail-label">Регион</div><div class="detail-value">${escapeHtml(region)}</div></div>
+      <div><div class="detail-label">Категория</div><div class="detail-value">${escapeHtml(category)}</div></div>
+      <div><div class="detail-label">Площадка</div><div class="detail-value"><span class="tag tag-platform">${escapeHtml(platform)}</span></div></div>
       <div><div class="detail-label">Опубликован</div><div class="detail-value">${published}</div></div>
-      <div><div class="detail-label">Дедлайн</div><div class="detail-value" style="color:var(--yellow)">${deadline}</div></div>
+      <div><div class="detail-label">Дедлайн</div><div class="detail-value" style="color:var(--yellow);font-weight:600;">${deadline}</div></div>
     </div>
-    ${url?`<a class="modal-link" href="${url}" target="_blank">🔗 Открыть на портале →</a>`:''}
+    ${url ? `<a class="modal-link" href="${escapeHtml(url)}" target="_blank" rel="noopener">🔗 Открыть на портале →</a>` : ''}
     <details style="margin-top:16px;">
-      <summary style="cursor:pointer;font-size:10px;color:var(--text3);outline:none;">Исходные данные API (JSON)</summary>
-      <pre style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:10px;overflow:auto;max-height:200px;color:var(--text2);">${JSON.stringify(item,null,2)}</pre>
+      <summary style="cursor:pointer;font-size:11px;color:var(--text3);outline:none;user-select:none;">Исходные данные API (JSON)</summary>
+      <pre style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:10px;overflow:auto;max-height:200px;color:var(--text2);font-family:'JetBrains Mono',monospace;">${escapeHtml(JSON.stringify(item,null,2))}</pre>
     </details>`;
   document.getElementById('modalOverlay').classList.add('active');
 }
 
-function closeModal(e) { if(e.target===document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModal(e) { if(e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
 function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('active'); }
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function saveToken() {
   TOKEN = document.getElementById('tokenInput').value.trim();
-  addLog(`Токен обновлён: ${TOKEN.substring(0,8)}...`, 'ok');
+  if(TOKEN) addLog(`Токен обновлён: ${TOKEN.substring(0,8)}...`, 'ok');
 }
 
 function switchEndpoint(ep, sidebarEl, epBtnEl) {
   currentEndpoint = ep;
   currentPage = 1;
-  // sidebar highlight
   if(sidebarEl) {
-    document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     sidebarEl.classList.add('active');
   }
-  // ep button highlight
   if(epBtnEl) {
-    document.querySelectorAll('.ep-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
     epBtnEl.classList.add('active');
   }
-  addLog(`Эндпоинт: /${ep}/`, 'info');
+  addLog(`Эндпоинт переключён: /${ep}/`, 'info');
 }
 
 function quickFilter(val) {
@@ -1071,14 +1071,14 @@ function quickFilter(val) {
   renderTable();
 }
 
-// Events
+// ─── EVENTS ───────────────────────────────────────────────────────────────────
 document.getElementById('searchInput').addEventListener('input', renderTable);
 document.getElementById('statusFilter').addEventListener('change', renderTable);
 document.getElementById('sortFilter').addEventListener('change', renderTable);
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalDirect(); });
 
 window.onload = () => {
-  addLog('Приложение запущено на Vercel','ok');
+  addLog('Приложение запущено','ok');
   addLog('Прокси: /api/proxy → api.tenderplus.kz','info');
   document.getElementById('emptyMsg').classList.add('active');
 };
