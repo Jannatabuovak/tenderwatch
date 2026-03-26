@@ -1,5 +1,8 @@
 {
   "name": "tenderwatch",
   "version": "1.0.0",
-  "engines": { "node": "22.x" }
+  "description": "TenderPlus API мониторинг тендеров Казахстана",
+  "engines": {
+    "node": "18.x"
+  }
 }
