@@ -9,9 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const isPost = req.method === 'POST';
-    const payload = isPost ? req.body : req.query;
-
+    const payload = req.method === 'POST' ? req.body : req.query;
     const { query, variables, token } = payload || {};
 
     if (!query) {
