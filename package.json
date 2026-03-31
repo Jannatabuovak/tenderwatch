@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "TenderPlus API мониторинг тендеров Казахстана",
   "engines": {
-    "node": "18.x"
+      "node": "20.x"
+  }
   }
 }
