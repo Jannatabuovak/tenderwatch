@@ -1,8 +1,5 @@
-// api/proxy.js — Vercel Serverless Function
-// Проксирует запросы к api.tenderplus.kz, обходя CORS
-
+// api/proxy.js
 export default async function handler(req, res) {
-  // CORS headers — разрешаем запросы с любого домена
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -11,28 +8,36 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Получаем путь и параметры из запроса
-  // Например: /api/proxy?path=tender/&token=xxx&limit=20&page=1
-  const { path, ...params } = req.query;
-
-  if (!path) {
-    return res.status(400).json({ error: 'Параметр path обязателен' });
-  }
-
-  // Собираем строку параметров
-  const queryString = new URLSearchParams(params).toString();
-  const targetUrl = `https://api.tenderplus.kz/${path}${queryString ? '?' + queryString : ''}`;
-
-  console.log(`[Proxy] → ${targetUrl}`);
-
   try {
+    const isPost = req.method === 'POST';
+    const payload = isPost ? req.body : req.query;
+
+    const { query, variables, token } = payload || {};
+
+    if (!query) {
+      return res.status(400).json({
+        error: 'Параметр query обязателен'
+      });
+    }
+
+    const targetUrl = 'https://api.tenderplus.kz/graphql';
+
+    console.log('[GraphQL Proxy] →', targetUrl);
+    console.log('[GraphQL Query] →', query);
+
     const response = await fetch(targetUrl, {
-      method: req.method,
+      method: 'POST',
       headers: {
-        'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'User-Agent': 'TenderWatch/1.0',
+        'Accept': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
       },
+      body: JSON.stringify({
+        query,
+        variables: typeof variables === 'string'
+          ? JSON.parse(variables || '{}')
+          : (variables || {})
+      })
     });
 
     const contentType = response.headers.get('content-type') || '';
@@ -40,16 +45,18 @@ export default async function handler(req, res) {
       ? await response.json()
       : await response.text();
 
-    console.log(`[Proxy] ← HTTP ${response.status}`);
+    console.log('[GraphQL Proxy] ← HTTP', response.status);
 
-    res.status(response.status).json(
-      typeof data === 'string' ? { raw: data } : data
+    return res.status(response.status).json(
+      typeof data === 'string'
+        ? { raw: data, targetUrl }
+        : { ...data, targetUrl }
     );
   } catch (err) {
-    console.error('[Proxy] Ошибка:', err.message);
-    res.status(500).json({
+    console.error('[GraphQL Proxy] Ошибка:', err.message);
+    return res.status(500).json({
       error: 'Ошибка прокси',
-      message: err.message,
+      message: err.message
     });
   }
 }
