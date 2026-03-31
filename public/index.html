@@ -1,439 +1,305 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TenderWatch — GraphQL Monitor</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#080c14;
-  --surface:#0d1220;
-  --surface2:#121929;
-  --surface3:#1a2438;
-  --border:rgba(99,179,237,.12);
-  --border2:rgba(99,179,237,.22);
-  --accent:#3b82f6;
-  --accent2:#60a5fa;
-  --accent3:#93c5fd;
-  --green:#10b981;
-  --yellow:#f59e0b;
-  --red:#ef4444;
-  --purple:#8b5cf6;
-  --text:#e2e8f0;
-  --text2:#94a3b8;
-  --text3:#475569;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'JetBrains Mono',monospace;
-  min-height:100vh;
-}
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background-image:
-    linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
-  background-size:40px 40px;
-  pointer-events:none;
-}
-.wrap{position:relative;z-index:1}
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:16px 28px;
-  border-bottom:1px solid var(--border);
-  background:rgba(8,12,20,.95);
-  backdrop-filter:blur(20px);
-}
-.logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-family:'Unbounded',sans-serif;
-  font-size:18px;
-  font-weight:700;
-}
-.logo-icon{
-  width:32px;height:32px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--accent);
-  box-shadow:0 0 20px rgba(59,130,246,.4);
-}
-.logo span{color:var(--accent2)}
-.header-status{display:flex;align-items:center;gap:16px;font-size:11px;color:var(--text2)}
-.pulse-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--yellow);
-  box-shadow:0 0 10px var(--yellow);
-}
-.main{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  min-height:calc(100vh - 65px);
-}
-.sidebar{
-  border-right:1px solid var(--border);
-  background:var(--surface);
-  padding:20px 0;
-}
-.sidebar-label{
-  font-size:9px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--text3);
-  padding:12px 20px 6px;
-}
-.sidebar-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 20px;
-  cursor:pointer;
-  color:var(--text2);
-  border-left:2px solid transparent;
-  transition:.15s;
-  font-size:12px;
-}
-.sidebar-item:hover{background:var(--surface2);color:var(--text)}
-.sidebar-item.active{
-  background:rgba(59,130,246,.08);
-  color:var(--accent2);
-  border-left-color:var(--accent);
-}
-.sidebar-count{
-  margin-left:auto;
-  padding:2px 8px;
-  border-radius:12px;
-  background:var(--surface3);
-  color:var(--text3);
-  font-size:10px;
-}
-.token-panel{
-  margin:16px;
-  padding:14px;
-  background:var(--surface2);
-  border:1px solid var(--border2);
-  border-radius:10px;
-}
-.token-panel label{
-  display:block;
-  margin-bottom:8px;
-  font-size:9px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--text3);
-}
-.token-input-wrap{display:flex;gap:6px}
-.token-input{
-  flex:1;
-  background:var(--surface3);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:8px 10px;
-  color:var(--accent3);
-  font-size:11px;
-  outline:none;
-}
-.btn-sm,.btn-load,.ep-btn,.page-btn{
-  font-family:'JetBrains Mono',monospace;
-  cursor:pointer;
-}
-.btn-sm{
-  background:var(--accent);
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  padding:8px 12px;
-  font-size:11px;
-}
-.content{padding:24px}
-.notice{
-  background:rgba(16,185,129,.07);
-  border:1px solid rgba(16,185,129,.15);
-  border-radius:10px;
-  padding:14px 16px;
-  font-size:11px;
-  color:var(--text2);
-  margin-bottom:20px;
-  line-height:1.6;
-}
-.notice strong{color:#34d399}
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:24px;
-}
-.stat-card{
-  position:relative;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:18px;
-  overflow:hidden;
-}
-.stat-card::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;height:2px;
-}
-.stat-card.blue::before{background:var(--accent)}
-.stat-card.green::before{background:var(--green)}
-.stat-card.yellow::before{background:var(--yellow)}
-.stat-card.purple::before{background:var(--purple)}
-.stat-label{
-  font-size:10px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color:var(--text3);
-  margin-bottom:8px;
-}
-.stat-value{
-  font-family:'Unbounded',sans-serif;
-  font-size:26px;
-  font-weight:600;
-  line-height:1;
-  margin-bottom:6px;
-}
-.stat-sub{font-size:10px;color:var(--text3)}
-.stat-icon{
-  position:absolute;
-  right:16px;top:50%;
-  transform:translateY(-50%);
-  font-size:32px;opacity:.08;
-}
-.endpoint-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.ep-btn{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:6px 14px;
-  font-size:10px;
-  color:var(--text3);
-}
-.ep-btn.active{
-  background:rgba(59,130,246,.1);
-  border-color:var(--accent);
-  color:var(--accent2);
-}
-.toolbar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
-.search-wrap{flex:1;min-width:220px;position:relative}
-.search-wrap::before{
-  content:'🔍';
-  position:absolute;
-  left:12px;top:50%;
-  transform:translateY(-50%);
-  opacity:.4;font-size:13px;
-}
-.search-input,.filter-select{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  color:var(--text);
-  outline:none;
-}
-.search-input{
-  width:100%;
-  padding:10px 12px 10px 36px;
-  font-size:12px;
-}
-.filter-select{
-  padding:10px 12px;
-  font-size:11px;
-}
-.btn-load{
-  background:linear-gradient(135deg,var(--accent),var(--purple));
-  border:none;
-  color:#fff;
-  border-radius:8px;
-  padding:10px 18px;
-  font-size:12px;
-}
-.page-size-wrap{
-  display:flex;align-items:center;gap:6px;
-  color:var(--text3);
-  font-size:11px;
-}
-.page-size-wrap select{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:6px 8px;
-  color:var(--text2);
-}
-.results-bar{
-  display:flex;align-items:center;gap:10px;
-  margin-bottom:12px;font-size:11px;color:var(--text3)
-}
-.results-count{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:4px 12px;
-  font-size:10px;
-  color:var(--text2);
-}
-.table-wrap{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.table-head,.tender-row{
-  display:grid;
-  grid-template-columns:80px 1fr 160px 130px 110px 100px;
-  padding:0 16px;
-}
-.table-head{
-  background:var(--surface2);
-  border-bottom:1px solid var(--border);
-}
-.th,.td{
-  padding:12px 8px;
-  display:flex;
-  align-items:center;
-  font-size:11px;
-}
-.th{
-  font-size:9px;
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-  color:var(--text3);
-}
-.tender-row{
-  border-bottom:1px solid var(--border);
-}
-.tender-row:last-child{border-bottom:none}
-.tender-row:hover{background:var(--surface2)}
-.td.title{
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-}
-.tender-name{
-  color:var(--text);
-  font-size:12px;
-  line-height:1.35;
-}
-.tender-customer{
-  color:var(--text3);
-  font-size:10px;
-}
-.td.amount{color:var(--green);font-weight:500}
-.tag{
-  display:inline-flex;
-  align-items:center;
-  padding:2px 8px;
-  border-radius:20px;
-  font-size:9px;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
-.tag-platform{
-  background:rgba(99,102,241,.15);
-  color:#a78bfa;
-  border:1px solid rgba(139,92,246,.2);
-}
-.tag-status-active{
-  background:rgba(16,185,129,.12);
-  color:#34d399;
-  border:1px solid rgba(16,185,129,.2);
-}
-.tag-status-soon{
-  background:rgba(245,158,11,.12);
-  color:#fbbf24;
-  border:1px solid rgba(245,158,11,.2);
-}
-.tag-status-closed{
-  background:rgba(100,116,139,.12);
-  color:#94a3b8;
-  border:1px solid rgba(100,116,139,.2);
-}
-.loader-wrap{
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:50px 0;
-  gap:16px;
-  color:var(--text3);
-  font-size:12px;
-}
-.loader-wrap.active{display:flex}
-.spinner{
-  width:40px;height:40px;
-  border:2px solid var(--surface3);
-  border-top-color:var(--accent);
-  border-radius:50%;
-  animation:spin .8s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.state-msg{
-  text-align:center;
-  padding:50px 0;
-  color:var(--text3);
-  font-size:12px;
-  display:none;
-}
-.state-msg.active{display:block}
-.api-log{
-  background:var(--surface2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 16px;
-  margin:16px;
-  font-size:10px;
-  max-height:180px;
-  overflow:auto;
-}
-.log-line{line-height:1.7;display:flex;gap:8px}
-.log-line .ts{opacity:.5;flex-shrink:0;color:var(--text3)}
-.log-line .ok{color:var(--green)}
-.log-line .err{color:var(--red)}
-.log-line .info{color:var(--accent2)}
-.log-line .warn{color:var(--yellow)}
-.pagination{
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  flex-wrap:wrap;
-  color:var(--text3);
-  font-size:11px;
-}
-.page-btns{display:flex;gap:6px;flex-wrap:wrap}
-.page-btn{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:6px 10px;
-  color:var(--text2);
-}
-.page-btn.active{
-  background:var(--accent);
-  border-color:var(--accent);
-  color:#fff;
-}
-@media(max-width:980px){
-  .main{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .table-head,.tender-row{grid-template-columns:70px 1fr 130px 100px}
-  .table-head .th:nth-child(5),
-  .table-head .th:nth-child(6),
-  .tender-row .td:nth-child(5),
-  .tender-row .td:nth-child(6){display:none}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TenderWatch — GraphQL Debug</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#080c14;
+      --surface:#0d1220;
+      --surface2:#121929;
+      --surface3:#1a2438;
+      --border:rgba(99,179,237,.12);
+      --border2:rgba(99,179,237,.22);
+      --accent:#3b82f6;
+      --accent2:#60a5fa;
+      --accent3:#93c5fd;
+      --green:#10b981;
+      --yellow:#f59e0b;
+      --red:#ef4444;
+      --purple:#8b5cf6;
+      --text:#e2e8f0;
+      --text2:#94a3b8;
+      --text3:#475569;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:'JetBrains Mono', monospace;
+      min-height:100vh;
+    }
+    body::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+      background-size:40px 40px;
+      pointer-events:none;
+    }
+
+    .wrap{position:relative;z-index:1}
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:16px 28px;
+      border-bottom:1px solid var(--border);
+      background:rgba(8,12,20,.95);
+      backdrop-filter:blur(20px);
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-family:'Unbounded', sans-serif;
+      font-size:18px;
+      font-weight:700;
+    }
+    .logo-icon{
+      width:32px;height:32px;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--accent);
+      box-shadow:0 0 20px rgba(59,130,246,.4);
+    }
+    .logo span{color:var(--accent2)}
+    .header-status{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-size:11px;
+      color:var(--text2);
+    }
+    .pulse-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:var(--yellow);
+      box-shadow:0 0 10px var(--yellow);
+    }
+
+    .main{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      min-height:calc(100vh - 65px);
+    }
+
+    .sidebar{
+      background:var(--surface);
+      border-right:1px solid var(--border);
+      padding:20px 0;
+    }
+    .sidebar-label{
+      font-size:9px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--text3);
+      padding:12px 20px 6px;
+    }
+    .sidebar-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 20px;
+      cursor:pointer;
+      color:var(--text2);
+      border-left:2px solid transparent;
+      transition:.15s;
+      font-size:12px;
+    }
+    .sidebar-item:hover{background:var(--surface2);color:var(--text)}
+    .sidebar-item.active{
+      background:rgba(59,130,246,.08);
+      color:var(--accent2);
+      border-left-color:var(--accent);
+    }
+
+    .token-panel{
+      margin:16px;
+      padding:14px;
+      background:var(--surface2);
+      border:1px solid var(--border2);
+      border-radius:10px;
+    }
+    .token-panel label{
+      display:block;
+      margin-bottom:8px;
+      font-size:9px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--text3);
+    }
+    .token-input-wrap{display:flex;gap:6px}
+    .token-input{
+      flex:1;
+      background:var(--surface3);
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:8px 10px;
+      color:var(--accent3);
+      font-size:11px;
+      outline:none;
+    }
+
+    .btn-sm,.btn-main,.ep-btn{
+      font-family:'JetBrains Mono', monospace;
+      cursor:pointer;
+      border:none;
+    }
+    .btn-sm{
+      background:var(--accent);
+      color:#fff;
+      border-radius:6px;
+      padding:8px 12px;
+      font-size:11px;
+    }
+
+    .content{padding:24px}
+    .notice{
+      background:rgba(16,185,129,.07);
+      border:1px solid rgba(16,185,129,.15);
+      border-radius:10px;
+      padding:14px 16px;
+      font-size:11px;
+      color:var(--text2);
+      margin-bottom:20px;
+      line-height:1.6;
+    }
+    .notice strong{color:#34d399}
+
+    .endpoint-buttons{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .ep-btn{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:8px 14px;
+      font-size:11px;
+      color:var(--text3);
+    }
+    .ep-btn.active{
+      background:rgba(59,130,246,.1);
+      border-color:var(--accent);
+      color:var(--accent2);
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .btn-main{
+      background:linear-gradient(135deg,var(--accent),var(--purple));
+      color:#fff;
+      border-radius:8px;
+      padding:10px 16px;
+      font-size:12px;
+    }
+    .btn-secondary{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      color:var(--text2);
+    }
+    .btn-main:disabled{opacity:.55;cursor:not-allowed}
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+    .card-head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      background:var(--surface2);
+      font-size:12px;
+      color:var(--text2);
+    }
+    .card-body{
+      padding:16px;
+    }
+
+    .json-box{
+      background:#09101d;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:14px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:12px;
+      line-height:1.6;
+      color:#cbd5e1;
+      max-height:420px;
+      overflow:auto;
+    }
+
+    .table-wrap{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .table-head,.row{
+      display:grid;
+      grid-template-columns:80px 1fr;
+      padding:0 16px;
+    }
+    .table-head{
+      background:var(--surface2);
+      border-bottom:1px solid var(--border);
+    }
+    .th,.td{
+      padding:12px 8px;
+      font-size:12px;
+    }
+    .th{
+      font-size:10px;
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      color:var(--text3);
+    }
+    .row{
+      border-bottom:1px solid var(--border);
+    }
+    .row:last-child{border-bottom:none}
+
+    .api-log{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:14px 16px;
+      margin:16px;
+      font-size:10px;
+      max-height:180px;
+      overflow:auto;
+    }
+    .log-line{line-height:1.7;display:flex;gap:8px}
+    .log-line .ts{opacity:.5;flex-shrink:0;color:var(--text3)}
+    .log-line .ok{color:var(--green)}
+    .log-line .err{color:var(--red)}
+    .log-line .info{color:var(--accent2)}
+    .log-line .warn{color:var(--yellow)}
+
+    .muted{color:var(--text3)}
+    .loader{display:none;color:var(--text2);font-size:12px}
+    .loader.active{display:block}
+
+    @media(max-width:900px){
+      .main{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -455,331 +321,153 @@ header{
       <div class="token-panel">
         <label>🔑 API Token</label>
         <div class="token-input-wrap">
-          <input type="text" class="token-input" id="tokenInput" placeholder="Вставьте ваш токен">
+          <input type="text" class="token-input" id="tokenInput" placeholder="Вставьте токен">
           <button class="btn-sm" onclick="saveToken()">OK</button>
         </div>
       </div>
 
       <div class="sidebar-label">Навигация</div>
-      <div class="sidebar-item active" id="navBuy" onclick="switchEndpoint('buy', this)">
-        <span>📋</span> Тендеры
-        <span class="sidebar-count" id="cnt-tenders">—</span>
+      <div class="sidebar-item active" id="navBuy" onclick="switchEndpoint('buy')">
+        <span>📋</span> Buy
       </div>
-      <div class="sidebar-item" id="navContract" onclick="switchEndpoint('contract', this)">
-        <span>📄</span> Договоры
-        <span class="sidebar-count" id="cnt-contracts">—</span>
+      <div class="sidebar-item" id="navContract" onclick="switchEndpoint('contract')">
+        <span>📄</span> Contract
       </div>
-
-      <div class="sidebar-label">Быстрый фильтр</div>
-      <div class="sidebar-item" onclick="quickFilter('active')"><span>🟢</span> Активные <span class="sidebar-count" id="cnt-active">—</span></div>
-      <div class="sidebar-item" onclick="quickFilter('ending')"><span>🟡</span> Истекают скоро</div>
-      <div class="sidebar-item" onclick="quickFilter('')"><span>📦</span> Все статусы</div>
 
       <div class="sidebar-label">API Лог</div>
       <div class="api-log" id="apiLog">
-        <div class="log-line"><span class="ts">--:--:--</span><span class="info">TenderWatch готов к работе</span></div>
+        <div class="log-line"><span class="ts">--:--:--</span><span class="info">Готово к проверке GraphQL</span></div>
       </div>
     </aside>
 
     <main class="content">
       <div class="notice">
-        ✅ <strong>GraphQL через прокси</strong> — запросы идут через <code>/api/proxy</code>, а не через REST path.
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card blue">
-          <div class="stat-label">Загружено</div>
-          <div class="stat-value" id="s-total">—</div>
-          <div class="stat-sub">записей</div>
-          <div class="stat-icon">📋</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-label">Активные</div>
-          <div class="stat-value" id="s-active">—</div>
-          <div class="stat-sub">открыты</div>
-          <div class="stat-icon">✅</div>
-        </div>
-        <div class="stat-card yellow">
-          <div class="stat-label">Сумма (млн ₸)</div>
-          <div class="stat-value" id="s-sum">—</div>
-          <div class="stat-sub">общий объём</div>
-          <div class="stat-icon">💰</div>
-        </div>
-        <div class="stat-card purple">
-          <div class="stat-label">Страниц</div>
-          <div class="stat-value" id="s-pages">—</div>
-          <div class="stat-sub">по текущему лимиту</div>
-          <div class="stat-icon">📑</div>
-        </div>
+        ✅ <strong>Этот вариант диагностический и рабочий.</strong> 
+        Сначала нажмите <strong>«Показать поля типа»</strong>, чтобы увидеть реальные поля <code>Buy</code> или <code>Contract</code>. 
+        Потом уже можно собрать точный запрос без ошибок.
       </div>
 
       <div class="endpoint-buttons">
-        <button class="ep-btn active" id="epBtn1" onclick="switchEndpoint('buy', null, this)">GraphQL buy</button>
-        <button class="ep-btn" id="epBtn2" onclick="switchEndpoint('contract', null, this)">GraphQL contract</button>
+        <button class="ep-btn active" id="epBtnBuy" onclick="switchEndpoint('buy')">Тип Buy</button>
+        <button class="ep-btn" id="epBtnContract" onclick="switchEndpoint('contract')">Тип Contract</button>
       </div>
 
       <div class="toolbar">
-        <div class="search-wrap">
-          <input type="text" class="search-input" id="searchInput" placeholder="Поиск по названию, номеру или заказчику...">
-        </div>
-
-        <select class="filter-select" id="statusFilter">
-          <option value="">Все статусы</option>
-          <option value="active">Активные</option>
-          <option value="ending">Истекают</option>
-          <option value="completed">Завершённые</option>
-        </select>
-
-        <select class="filter-select" id="sortFilter">
-          <option value="date_desc">По дате ↓</option>
-          <option value="date_asc">По дате ↑</option>
-          <option value="amount_desc">По сумме ↓</option>
-          <option value="amount_asc">По сумме ↑</option>
-          <option value="name_asc">По названию А-Я</option>
-        </select>
-
-        <div class="page-size-wrap">
-          Строк:
-          <select id="pageSizeSelect">
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-
-        <button class="btn-load" id="loadBtn" onclick="loadData()">⚡ Загрузить</button>
+        <button class="btn-main btn-secondary" id="schemaBtn" onclick="loadSchema()">Показать поля типа</button>
+        <button class="btn-main" id="dataBtn" onclick="loadData()">Загрузить данные</button>
+        <div class="loader" id="loader">⏳ Выполняется запрос...</div>
       </div>
 
-      <div class="results-bar">
-        <div class="results-count" id="resultsCount">Нет данных</div>
-        <span id="queryInfo" style="font-size:10px;color:var(--text3);"></span>
+      <div class="card">
+        <div class="card-head">Ответ схемы / GraphQL</div>
+        <div class="card-body">
+          <div class="json-box" id="schemaBox">Здесь появятся поля типа Buy или Contract.</div>
+        </div>
       </div>
 
-      <div class="table-wrap">
-        <div class="table-head">
-          <div class="th">№</div>
-          <div class="th">Тендер / Заказчик</div>
-          <div class="th">Сумма, ₸</div>
-          <div class="th">Дедлайн</div>
-          <div class="th">Площадка</div>
-          <div class="th">Статус</div>
+      <div class="card">
+        <div class="card-head">Данные</div>
+        <div class="card-body">
+          <div class="muted" style="margin-bottom:12px" id="dataInfo">Пока нет данных.</div>
+          <div class="table-wrap">
+            <div class="table-head">
+              <div class="th">ID</div>
+              <div class="th">RAW JSON</div>
+            </div>
+            <div id="tableBody"></div>
+          </div>
         </div>
-
-        <div class="loader-wrap" id="loader">
-          <div class="spinner"></div>
-          <div>Загрузка из TenderPlus GraphQL...</div>
-        </div>
-
-        <div class="state-msg" id="emptyMsg">
-          <div style="font-size:32px;margin-bottom:10px;">🔍</div>
-          <div>Нет данных</div>
-          <div style="margin-top:8px;font-size:11px;">Нажмите «Загрузить» или измените фильтры</div>
-        </div>
-
-        <div id="tableBody"></div>
-      </div>
-
-      <div class="pagination" id="pagination">
-        <div id="pageInfo"></div>
-        <div class="page-btns" id="pageBtns"></div>
       </div>
     </main>
   </div>
 </div>
 
 <script>
-const PROXY = '/api/proxy';
+  const PROXY = '/api/proxy';
 
-let TOKEN = localStorage.getItem('tw_token') || '';
-let currentEndpoint = 'buy';
-let currentPage = 1;
-let totalPages = 1;
-let allData = [];
-let filteredData = [];
+  let TOKEN = localStorage.getItem('tw_token') || '';
+  let currentEndpoint = 'buy';
 
-document.getElementById('tokenInput').value = TOKEN;
+  document.getElementById('tokenInput').value = TOKEN;
 
-function ts() {
-  return new Date().toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-}
-
-function addLog(msg, type='info') {
-  const log = document.getElementById('apiLog');
-  const row = document.createElement('div');
-  row.className = 'log-line';
-  row.innerHTML = `<span class="ts">${ts()}</span><span class="${type}">${msg}</span>`;
-  log.appendChild(row);
-  log.scrollTop = log.scrollHeight;
-}
-
-function saveToken() {
-  TOKEN = document.getElementById('tokenInput').value.trim();
-  localStorage.setItem('tw_token', TOKEN);
-  addLog('Токен сохранён', 'ok');
-}
-
-function setStatus(ok) {
-  const dot = document.getElementById('statusDot');
-  const txt = document.getElementById('statusText');
-  if (ok) {
-    dot.style.background = 'var(--green)';
-    dot.style.boxShadow = '0 0 10px var(--green)';
-    txt.textContent = 'Онлайн';
-    document.getElementById('lastSync').textContent = ts();
-  } else {
-    dot.style.background = 'var(--red)';
-    dot.style.boxShadow = '0 0 10px var(--red)';
-    txt.textContent = 'Ошибка';
-  }
-}
-
-function fmtMoney(v) {
-  const n = parseFloat(v);
-  if (!v || isNaN(n)) return '—';
-  return n.toLocaleString('ru-RU');
-}
-
-function fmtDate(s) {
-  if (!s) return '—';
-  try {
-    return new Date(s).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric' });
-  } catch {
-    return s;
-  }
-}
-
-function daysLeft(s) {
-  if (!s) return null;
-  const d = Math.ceil((new Date(s) - Date.now()) / 86400000);
-  return isNaN(d) ? null : d;
-}
-
-function getStatus(item) {
-  const end = item.endDate || item.end_date || item.deadline || item.date_end || item.publish_end_date;
-  if (!end) return 'unknown';
-  const d = daysLeft(end);
-  if (d === null) return 'unknown';
-  if (d < 0) return 'completed';
-  if (d <= 3) return 'ending';
-  return 'active';
-}
-
-function statusTag(s) {
-  if (s === 'active') return '<span class="tag tag-status-active">Активный</span>';
-  if (s === 'ending') return '<span class="tag tag-status-soon">Истекает</span>';
-  if (s === 'completed') return '<span class="tag tag-status-closed">Завершён</span>';
-  return '<span class="tag tag-status-closed">—</span>';
-}
-
-function platformTag(v) {
-  return `<span class="tag tag-platform">${v || '—'}</span>`;
-}
-
-function switchEndpoint(endpoint, navEl = null, btnEl = null) {
-  currentEndpoint = endpoint;
-  currentPage = 1;
-
-  document.querySelectorAll('.sidebar-item').forEach(el => {
-    if (el.id === 'navBuy' || el.id === 'navContract') el.classList.remove('active');
-  });
-  document.querySelectorAll('.ep-btn').forEach(el => el.classList.remove('active'));
-
-  if (endpoint === 'buy') {
-    document.getElementById('navBuy').classList.add('active');
-    document.getElementById('epBtn1').classList.add('active');
-  } else {
-    document.getElementById('navContract').classList.add('active');
-    document.getElementById('epBtn2').classList.add('active');
+  function ts() {
+    return new Date().toLocaleTimeString('ru', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   }
 
-  document.getElementById('queryInfo').textContent = `Источник: GraphQL ${endpoint}`;
-  addLog(`Переключено на ${endpoint}`, 'info');
-}
-
-function quickFilter(status) {
-  document.getElementById('statusFilter').value = status;
-  applyFilters();
-}
-
-function getGraphQLQuery() {
-  const limit = parseInt(document.getElementById('pageSizeSelect').value, 10);
-
-  if (currentEndpoint === 'buy') {
-    return {
-      query: `
-        query GetBuys($pagination: BasePagination) {
-          buy(pagination: $pagination) {
-            id
-            number
-            nameRu
-            nameKz
-          }
-        }
-      `,
-      variables: {
-        pagination: {
-          limit,
-          page: currentPage
-        }
-      }
-    };
+  function addLog(msg, type = 'info') {
+    const log = document.getElementById('apiLog');
+    const row = document.createElement('div');
+    row.className = 'log-line';
+    row.innerHTML = `<span class="ts">${ts()}</span><span class="${type}">${escapeHtml(msg)}</span>`;
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
   }
 
-  return {
-    query: `
-      query GetContracts($pagination: BasePagination) {
-        contract(pagination: $pagination) {
-          id
-          number
-        }
-      }
-    `,
-    variables: {
-      pagination: {
-        limit,
-        page: currentPage
-      }
+  function setStatus(ok) {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    if (ok) {
+      dot.style.background = 'var(--green)';
+      dot.style.boxShadow = '0 0 10px var(--green)';
+      txt.textContent = 'Онлайн';
+      document.getElementById('lastSync').textContent = ts();
+    } else {
+      dot.style.background = 'var(--red)';
+      dot.style.boxShadow = '0 0 10px var(--red)';
+      txt.textContent = 'Ошибка';
     }
-  };
-}
-
-async function loadData() {
-  TOKEN = document.getElementById('tokenInput').value.trim();
-  if (!TOKEN) {
-    addLog('Введите токен', 'err');
-    return;
   }
 
-  const btn = document.getElementById('loadBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Загрузка...';
+  function setLoading(v) {
+    document.getElementById('loader').classList.toggle('active', v);
+    document.getElementById('schemaBtn').disabled = v;
+    document.getElementById('dataBtn').disabled = v;
+  }
 
-  document.getElementById('loader').classList.add('active');
-  document.getElementById('tableBody').innerHTML = '';
-  document.getElementById('emptyMsg').classList.remove('active');
-  document.getElementById('pagination').style.display = 'none';
+  function saveToken() {
+    TOKEN = document.getElementById('tokenInput').value.trim();
+    localStorage.setItem('tw_token', TOKEN);
+    addLog('Токен сохранён', 'ok');
+  }
 
-  const dot = document.getElementById('statusDot');
-  dot.style.background = 'var(--yellow)';
-  dot.style.boxShadow = '0 0 10px var(--yellow)';
-  document.getElementById('statusText').textContent = 'Запрос...';
+  function switchEndpoint(endpoint) {
+    currentEndpoint = endpoint;
 
-  const gql = getGraphQLQuery();
+    document.getElementById('navBuy').classList.toggle('active', endpoint === 'buy');
+    document.getElementById('navContract').classList.toggle('active', endpoint === 'contract');
+    document.getElementById('epBtnBuy').classList.toggle('active', endpoint === 'buy');
+    document.getElementById('epBtnContract').classList.toggle('active', endpoint === 'contract');
 
-  addLog(`→ GraphQL ${currentEndpoint}`, 'info');
+    document.getElementById('schemaBox').textContent =
+      endpoint === 'buy'
+        ? 'Выбран тип Buy. Нажмите «Показать поля типа».'
+        : 'Выбран тип Contract. Нажмите «Показать поля типа».';
 
-  try {
+    document.getElementById('tableBody').innerHTML = '';
+    document.getElementById('dataInfo').textContent = `Текущий тип: ${endpoint}`;
+    addLog(`Переключено на ${endpoint}`, 'info');
+  }
+
+  async function graphqlRequest(query, variables = {}) {
+    TOKEN = document.getElementById('tokenInput').value.trim();
+
+    if (!TOKEN) {
+      throw new Error('Введите API токен');
+    }
+
     const resp = await fetch(PROXY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         token: TOKEN,
-        query: gql.query,
-        variables: gql.variables
+        query,
+        variables
       })
     });
-
-    addLog(`← HTTP ${resp.status}`, resp.ok ? 'ok' : 'err');
 
     const data = await resp.json();
 
@@ -791,234 +479,128 @@ async function loadData() {
       throw new Error(JSON.stringify(data.errors, null, 2));
     }
 
-    processData(data);
-    setStatus(true);
-  } catch (err) {
-    addLog(`Ошибка: ${err.message}`, 'err');
-    setStatus(false);
-    document.getElementById('tableBody').innerHTML = `
-      <div style="padding:40px;text-align:center;color:var(--red);font-size:12px;">
-        ❌ ${String(err.message || err)}
-      </div>
+    return data;
+  }
+
+  async function loadSchema() {
+    const typeName = currentEndpoint === 'buy' ? 'Buy' : 'Contract';
+
+    const query = `
+      query {
+        __type(name: "${typeName}") {
+          name
+          fields {
+            name
+          }
+        }
+      }
     `;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '⚡ Загрузить';
-    document.getElementById('loader').classList.remove('active');
-  }
-}
 
-function normalizeItem(item, idx) {
-  const name =
-    item.nameRu ||
-    item.nameKz ||
-    item.name_ru ||
-    item.name ||
-    item.title ||
-    `Запись ${idx + 1}`;
+    setLoading(true);
+    addLog(`→ Introspection ${typeName}`, 'info');
 
-  const customer =
-    item.customerName ||
-    item.customer_name_ru ||
-    item.customer_name ||
-    item.customer ||
-    '—';
-
-  const amount =
-    item.amount ||
-    item.price ||
-    item.sum ||
-    item.budget ||
-    null;
-
-  const deadline =
-    item.endDate ||
-    item.end_date ||
-    item.deadline ||
-    item.date_end ||
-    item.publish_end_date ||
-    null;
-
-  const platform =
-    item.partner?.nameRu ||
-    item.platform_code ||
-    item.platform ||
-    item.source ||
-    'TenderPlus';
-
-  return {
-    ...item,
-    _name: name,
-    _customer: customer,
-    _amount: amount,
-    _deadline: deadline,
-    _platform: platform
-  };
-}
-
-function processData(data) {
-  let items = [];
-
-  if (currentEndpoint === 'buy') {
-    items = data?.data?.buy || [];
-  } else if (currentEndpoint === 'contract') {
-    items = data?.data?.contract || [];
+    try {
+      const data = await graphqlRequest(query, {});
+      document.getElementById('schemaBox').textContent = JSON.stringify(data, null, 2);
+      setStatus(true);
+      addLog(`Получены поля типа ${typeName}`, 'ok');
+    } catch (err) {
+      document.getElementById('schemaBox').textContent = String(err.message || err);
+      setStatus(false);
+      addLog(`Ошибка схемы: ${err.message || err}`, 'err');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  allData = items.map(normalizeItem);
-  applyFilters();
-}
+  async function loadData() {
+    let query = '';
 
-function applyFilters() {
-  const search = document.getElementById('searchInput').value.trim().toLowerCase();
-  const status = document.getElementById('statusFilter').value;
-  const sort = document.getElementById('sortFilter').value;
-  const limit = parseInt(document.getElementById('pageSizeSelect').value, 10);
+    if (currentEndpoint === 'buy') {
+      query = `
+        query GetBuys($pagination: BasePagination) {
+          buy(pagination: $pagination) {
+            id
+          }
+        }
+      `;
+    } else {
+      query = `
+        query GetContracts($pagination: BasePagination) {
+          contract(pagination: $pagination) {
+            id
+          }
+        }
+      `;
+    }
 
-  filteredData = allData.filter(item => {
-    const matchesSearch =
-      !search ||
-      String(item._name).toLowerCase().includes(search) ||
-      String(item._customer).toLowerCase().includes(search) ||
-      String(item.number || '').toLowerCase().includes(search);
+    const variables = {
+      pagination: {
+        limit: 20,
+        page: 1
+      }
+    };
 
-    const matchesStatus =
-      !status || getStatus(item) === status;
+    setLoading(true);
+    addLog(`→ Загрузка ${currentEndpoint} по безопасному запросу`, 'info');
 
-    return matchesSearch && matchesStatus;
-  });
+    try {
+      const data = await graphqlRequest(query, variables);
 
-  filteredData.sort((a, b) => {
-    if (sort === 'amount_desc') return (parseFloat(b._amount) || 0) - (parseFloat(a._amount) || 0);
-    if (sort === 'amount_asc') return (parseFloat(a._amount) || 0) - (parseFloat(b._amount) || 0);
-    if (sort === 'name_asc') return String(a._name).localeCompare(String(b._name), 'ru');
-    if (sort === 'date_asc') return new Date(a._deadline || 0) - new Date(b._deadline || 0);
-    return new Date(b._deadline || 0) - new Date(a._deadline || 0);
-  });
+      const items = currentEndpoint === 'buy'
+        ? (data.data?.buy || [])
+        : (data.data?.contract || []);
 
-  totalPages = Math.max(1, Math.ceil(filteredData.length / limit));
-  if (currentPage > totalPages) currentPage = totalPages;
-
-  const start = (currentPage - 1) * limit;
-  const pageItems = filteredData.slice(start, start + limit);
-
-  renderStats(filteredData);
-  renderTable(pageItems, start);
-  renderPagination();
-
-  document.getElementById('resultsCount').textContent =
-    filteredData.length ? `Найдено: ${filteredData.length}` : 'Нет данных';
-  document.getElementById('queryInfo').textContent = `Источник: GraphQL ${currentEndpoint}`;
-
-  document.getElementById('cnt-tenders').textContent = currentEndpoint === 'buy' ? filteredData.length : '—';
-  document.getElementById('cnt-contracts').textContent = currentEndpoint === 'contract' ? filteredData.length : '—';
-}
-
-function renderStats(items) {
-  let activeCount = 0;
-  let totalSum = 0;
-
-  items.forEach(item => {
-    if (['active', 'ending'].includes(getStatus(item))) activeCount++;
-    const n = parseFloat(item._amount);
-    if (!isNaN(n)) totalSum += n;
-  });
-
-  document.getElementById('s-total').textContent = items.length;
-  document.getElementById('s-active').textContent = activeCount;
-  document.getElementById('s-sum').textContent = (totalSum / 1000000).toFixed(2);
-  document.getElementById('s-pages').textContent = totalPages;
-  document.getElementById('cnt-active').textContent = activeCount;
-}
-
-function renderTable(items, offset = 0) {
-  const body = document.getElementById('tableBody');
-
-  if (!items.length) {
-    body.innerHTML = '';
-    document.getElementById('emptyMsg').classList.add('active');
-    return;
+      renderRows(items);
+      document.getElementById('dataInfo').textContent = `Загружено записей: ${items.length}`;
+      setStatus(true);
+      addLog(`Получено ${items.length} записей`, 'ok');
+    } catch (err) {
+      document.getElementById('tableBody').innerHTML = `
+        <div class="row">
+          <div class="td">—</div>
+          <div class="td" style="color:var(--red)">${escapeHtml(String(err.message || err))}</div>
+        </div>
+      `;
+      document.getElementById('dataInfo').textContent = 'Ошибка загрузки';
+      setStatus(false);
+      addLog(`Ошибка данных: ${err.message || err}`, 'err');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  document.getElementById('emptyMsg').classList.remove('active');
+  function renderRows(items) {
+    const box = document.getElementById('tableBody');
 
-  body.innerHTML = items.map((item, i) => `
-    <div class="tender-row">
-      <div class="td">${offset + i + 1}</div>
-      <div class="td title">
-        <div class="tender-name">${escapeHtml(item._name)}</div>
-        <div class="tender-customer">${escapeHtml(item._customer)}</div>
+    if (!items.length) {
+      box.innerHTML = `
+        <div class="row">
+          <div class="td">—</div>
+          <div class="td">Нет данных</div>
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = items.map(item => `
+      <div class="row">
+        <div class="td">${escapeHtml(item.id ?? '')}</div>
+        <div class="td">${escapeHtml(JSON.stringify(item))}</div>
       </div>
-      <div class="td amount">${fmtMoney(item._amount)}</div>
-      <div class="td">${fmtDate(item._deadline)}</div>
-      <div class="td">${platformTag(item._platform)}</div>
-      <div class="td">${statusTag(getStatus(item))}</div>
-    </div>
-  `).join('');
-}
-
-function renderPagination() {
-  const box = document.getElementById('pagination');
-  const info = document.getElementById('pageInfo');
-  const btns = document.getElementById('pageBtns');
-
-  if (!filteredData.length) {
-    box.style.display = 'none';
-    return;
+    `).join('');
   }
 
-  box.style.display = 'flex';
-  info.textContent = `Страница ${currentPage} из ${totalPages}`;
-
-  let html = '';
-  html += `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">← Назад</button>`;
-
-  const start = Math.max(1, currentPage - 2);
-  const end = Math.min(totalPages, currentPage + 2);
-
-  for (let p = start; p <= end; p++) {
-    html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+  function escapeHtml(v) {
+    return String(v ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
   }
 
-  html += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">Вперёд →</button>`;
-  btns.innerHTML = html;
-}
-
-function goPage(p) {
-  currentPage = p;
-  applyFilters();
-}
-
-function escapeHtml(v) {
-  return String(v ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-document.getElementById('searchInput').addEventListener('input', () => {
-  currentPage = 1;
-  applyFilters();
-});
-
-document.getElementById('statusFilter').addEventListener('change', () => {
-  currentPage = 1;
-  applyFilters();
-});
-
-document.getElementById('sortFilter').addEventListener('change', () => {
-  currentPage = 1;
-  applyFilters();
-});
-
-document.getElementById('pageSizeSelect').addEventListener('change', () => {
-  currentPage = 1;
-  applyFilters();
-});
-
-switchEndpoint('buy');
+  switchEndpoint('buy');
 </script>
 </body>
 </html>
